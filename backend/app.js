@@ -23,53 +23,54 @@ const app = express();
 // })
 
 const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://jimbob:<PASSWORD>@cluster0-pme76.mongodb.net/test?retryWrites=true&w=majority',
-  { useNewUrlParser: true,
-    useUnifiedTopology: true })
-  .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch(() => console.log('Connexion à MongoDB échouée !'));
+const Thing = require('./models/Thing');
+
+mongoose.connect('mongodb+srv://m40282897:ma-gra12@cluster0.7q1vrxe.mongodb.net/nom_de_ta_base?retryWrites=true&w=majority&appName=Cluster0',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => console.log(' Connexion à MongoDB réussie !'))
+  .catch((err) => console.error(' Connexion à MongoDB échouée !', err));
+
 
 app.use(express.json()); // Middleware pour analyser le corps des requêtes JSON
 
 
+
 // Middleware CORS 
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Origin', '*'); // autorise toutes les origines
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   next();
 });
 
 app.post('/api/stuff', (req, res, next) => {
-  console.log(req.body);
-  res.status(201).json({
-    message: 'Objet cree !'
-  });
-
+ delete req.body._id;
+ const thing = new Thing({
+  ...req.body //methode spread don pas besion d'ecrire tous les arguments 
+ });
+ thing.save() //La méthode save() renvoie une Promise
+  .then(() => res.status(201).json({message: 'Objet enregistre'}))
+  .catch(error => res.status(400).json({EvalError: 'Erreur d\'enregistrement'}));
 });
+
+app.get('/api/stuff/:id', (req, res, next) => {
+  Thing.findOne({ _id: req.params.id })
+    .then(thing => res.status(200).json(thing))
+    .catch(error => res.status(404).json({ error }));
+});
+
   
   // Route API
-  app.get('/api/stuff', (req, res, next) => {
-    const stuff = [
-      {
-        _id: 'oejfoejf',
-        title: 'Mon premier objet',
-        description: 'Les infos de mon premier objet',
-        imageUrl: 'https://cdn.pixabay.com/photo/2016/11/18/12/24/cat-1848500_1280.jpg', // OK
-        price: 5000,
-        userId: 'fyewteriuer',
-      },
-      {
-        _id: 'oejfoejfyu',
-        title: 'Mon deuxième objet',
-        description: 'Les infos de mon deuxième objet',
-        imageUrl: 'https://cdn.pixabay.com/photo/2017/11/09/21/41/cat-2934720_1280.jpg', // NOUVELLE IMAGE OK
-        price: 5000000,
-        userId: 'fyewter',
-      },
-    ];
-    res.status(200).json(stuff);
-  });
+app.get('/api/stuff', (req, res, next) => {
+    
+  Thing.find()
+    .then(things => res.status(200).json(things))
+    .catch(error => res.status(400).json({ error }));
+   
+});
   
   module.exports = app;
   
