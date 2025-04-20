@@ -2,6 +2,7 @@ const express = require('express');
 
 const app = express();
 
+
 // //la fonction next permet de renvoyer la requete à la prochaine fonction middleware
 // app.use((req, res, next) =>{
 //     console.log('Requête reçue !');
@@ -23,7 +24,7 @@ const app = express();
 // })
 
 const mongoose = require('mongoose');
-const Thing = require('./models/Thing');
+const stuffRoutes = require('.routes/stuff'); //importation du router stuff
 
 mongoose.connect('mongodb+srv://m40282897:ma-gra12@cluster0.7q1vrxe.mongodb.net/nom_de_ta_base?retryWrites=true&w=majority&appName=Cluster0',
   {
@@ -34,8 +35,9 @@ mongoose.connect('mongodb+srv://m40282897:ma-gra12@cluster0.7q1vrxe.mongodb.net/
   .catch((err) => console.error(' Connexion à MongoDB échouée !', err));
 
 
-app.use(express.json()); // Middleware pour analyser le corps des requêtes JSON
+app.use(bodyParser.json()); // Middleware pour analyser le corps des requêtes JSON  
 
+app.use('/api/stuff', stuffRoutes); // Utilisation du router pour les requêtes vers /api/stuff
 
 
 // Middleware CORS 
@@ -46,49 +48,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post('/api/stuff', (req, res, next) => {
- delete req.body._id;
- const thing = new Thing({
-  ...req.body //methode spread don pas besion d'ecrire tous les arguments 
- });
- thing.save() //La méthode save() renvoie une Promise
-  .then(() => res.status(201).json({message: 'Objet enregistre'}))
-  .catch(error => res.status(400).json({EvalError: 'Erreur d\'enregistrement'}));
-});
 
-
-//modification d'un objet
-app.put('/api/stuff/:id', (req, res, next) => {
-  Thing.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
-    .then(() => res.status(201).json({ message: 'Objet modifié !' }))
-    .catch(error => res.status(400).json({ error }));
-})
-
-//supression d'un objet
-app.put('/api/stuff/:id', (req, res, next) => {
-  Thing.deleteOne({ _id: req.param.id})
-    .then(() => res.status(200).json({message: 'Objet supprime!'}))
-    .catch(error => res.status(400).json(errror));
-})
-
-app.get('/api/stuff/:id', (req, res, next) => {
-  Thing.findOne({ _id: req.params.id })
-    .then(thing => res.status(200).json(thing))
-    .catch(error => res.status(404).json({ error }));
-});
-
-  
-  // Route API
-app.get('/api/stuff', (req, res, next) => {
-    
-  Thing.find()
-    .then(things => res.status(200).json(things))
-    .catch(error => res.status(400).json({ error }));
-   
-});
-  
-  module.exports = app;
-  
 
 module.exports = app;
 
