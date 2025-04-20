@@ -64,6 +64,13 @@ app.put('/api/stuff/:id', (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 })
 
+//supression d'un objet
+app.put('/api/stuff/:id', (req, res, next) => {
+  Thing.deleteOne({ _id: req.param.id})
+    .then(() => res.status(200).json({message: 'Objet supprime!'}))
+    .catch(error => res.status(400).json(errror));
+})
+
 app.get('/api/stuff/:id', (req, res, next) => {
   Thing.findOne({ _id: req.params.id })
     .then(thing => res.status(200).json(thing))
