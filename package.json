@@ -3,6 +3,7 @@
     "concurrently": "^9.1.2"
   },
   "dependencies": {
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "mongoose-unique-validator": "^4.0.1"
   }
 }
