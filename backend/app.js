@@ -25,7 +25,7 @@ const app = express();
 
 const mongoose = require('mongoose');
 const stuffRoutes = require('./routes/stuff'); //importation du router stuff
-const userRoutes = require('./routes.user');
+const userRoutes = require('./routes/user');
 
 mongoose.connect('mongodb+srv://m40282897:ma-gra12@cluster0.7q1vrxe.mongodb.net/nom_de_ta_base?retryWrites=true&w=majority&appName=Cluster0',
   {
