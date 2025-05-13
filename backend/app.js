@@ -1,5 +1,5 @@
 const express = require('express');
-
+const path = require('path'); //importation du module path
 const app = express();
 
 
@@ -45,8 +45,10 @@ app.use((req, res, next) => {
   next();
 });
 
+
 app.use('/api/stuff', stuffRoutes); // Utilisation du router pour les requêtes vers /api/stuff
 app.use('/api/auth', userRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images'))); // Middleware pour servir les fichiers statiques du dossier images
 
 
 
